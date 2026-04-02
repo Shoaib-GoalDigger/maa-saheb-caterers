@@ -125,6 +125,14 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
+# WhiteNoise ko bolenge ki static files handle kare
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# --- MEDIA FILES (IMAGES/VIDEOS) FOR CLOUDINARY ---
+# Yeh check karega ki agar CLOUDINARY_URL server par hai, tabhi Cloudinary use kare
+if 'CLOUDINARY_URL' in os.environ:
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 
 # extra add on 
 MEDIA_URL = '/media/'
