@@ -25,8 +25,8 @@ SECRET_KEY = 'django-insecure-pv_daq98k64f_7s$t)9#mpiy#5bo1#d&o1%pw1nq0kb@vnl^3h
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True #------------------------------------------------------------------------------------------
-# ALLOWED_HOSTS = ["*"]
-ALLOWED_HOSTS = [ '192.168.0.104' , 'localhost','127.0.0.1']
+ALLOWED_HOSTS = ["*"]
+# ALLOWED_HOSTS = [ '192.168.0.104' , 'localhost','127.0.0.1']/
 
 CSRF_TRUSTED_ORIGINS = [
     'https://*.pythonanywhere.com'
@@ -49,6 +49,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
