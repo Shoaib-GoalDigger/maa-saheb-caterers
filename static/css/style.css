@@ -17,6 +17,10 @@
   -webkit-tap-highlight-color: transparent; /* YEH JADUI LINE BLUE BOX GAYAB KAR DEGI */
 }
 
+body {
+    padding-bottom: 90px; /* Yeh niche 90px ki khaali jagah bana dega taaki nav bar kuch na chhupaye */
+}
+
 /* Aur buttons/links ko aur smooth feel dene ke liye ye bhi add kar do */
 button, a {
   outline: none;
@@ -158,39 +162,103 @@ button, a {
 /* ══════════════════════════════
     ABOUT
 ══════════════════════════════ */
-.about-hero {
-  background: linear-gradient(160deg, var(--red) 0%, var(--orange) 100%);
-  color: #fff; padding: 48px 24px 36px; text-align: center;
-}
-.about-hero .av {
-  width: 80px; height: 80px; border-radius: 50%;
-  background: rgba(255,255,255,.2);
-  display: inline-flex; align-items: center; justify-content: center;
-  font-size: 2.2rem; margin-bottom: 12px; border: 3px solid rgba(255,255,255,.4);
-}
-.about-hero h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; }
-.about-hero p  { font-size: .88rem; opacity: .85; margin-top: 6px; }
-.about-body { padding: 24px 16px; }
-.about-card {
-  background: var(--white); border-radius: 16px; padding: 20px;
-  margin-bottom: 14px; box-shadow: 0 2px 12px rgba(0,0,0,.06);
-  border-left: 4px solid var(--orange);
-}
-.about-card h3 { color: var(--red); margin-bottom: 7px; font-size: 1rem; }
-.about-card p  { font-size: .85rem; color: var(--muted); line-height: 1.7; }
-.niyaz-card {
-  background: linear-gradient(135deg,#fff5ee,#ffe8d6);
-  border-radius: 16px; padding: 22px; text-align: center;
-  border: 2px dashed var(--orange); margin-bottom: 14px;
-}
-.niyaz-card .heart { font-size: 2.4rem; margin-bottom: 8px; }
-.niyaz-card h3 { color: var(--red); font-size: 1.15rem; margin-bottom: 7px; }
-.niyaz-card p  { font-size: .84rem; color: var(--muted); line-height: 1.7; }
-.stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-top: 4px; }
-.stat-box { background: var(--orange); color: #fff; border-radius: 14px; padding: 16px 8px; text-align: center; }
-.stat-box .num { font-size: 1.5rem; font-weight: 700; }
-.stat-box .lbl { font-size: .68rem; opacity: .9; margin-top: 2px; }
+/* ══════════════════════════════
+    ABOUT US SECTION (Premium UI)
+══════════════════════════════ */
 
+/* 1. HERO SECTION */
+.hero {
+    display: flex;
+    align-items: center;
+    padding: 60px 20px;
+    /* Dhyan dein: URL mein '../images/' lagaya hai taaki live par image load ho */
+    background: linear-gradient(rgba(26, 10, 0, 0.7), rgba(193, 18, 31, 0.4)), url("../images/food.jpg"); 
+    background-size: cover;
+    background-position: center;
+    color: var(--white);
+    text-align: center;
+}
+.hero-text { margin: 0 auto; }
+.hero-text h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; line-height: 1.2; margin-bottom: 10px; }
+.hero-text span { color: var(--orange); } 
+.hero-text p { font-size: 1.1rem; opacity: 0.9; }
+
+/* 2. INFO & CARDS SECTION */
+.info {
+    padding: 40px 20px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+.card {
+    background: var(--white);
+    padding: 25px;
+    border-left: 5px solid var(--orange);
+    margin-bottom: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+.highlight {
+    background: #fffcf8;
+    border-left: 5px solid var(--red);
+}
+.card h2 { 
+    color: var(--red); 
+    margin-bottom: 12px; 
+    font-family: 'Cormorant Garamond', serif; 
+    font-size: 1.8rem;
+}
+.card p { color: var(--dark); line-height: 1.6; font-size: 0.95rem; }
+
+/* 3. FLEX-CARD LAYOUT (Mobile First) */
+.flex-card {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    gap: 25px;
+}
+.section-img {
+    width: 100%;
+    max-width: 320px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* 4. STATS SECTION */
+.stats {
+    display: flex;
+    flex-direction: column; /* Mobile par upar-niche dikhega */
+    gap: 15px;
+    padding: 20px 20px 50px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+.stat-box {
+    flex: 1;
+    background: linear-gradient(135deg, var(--red), var(--orange));
+    color: var(--white);
+    padding: 25px 20px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 6px 15px rgba(242, 100, 25, 0.3);
+}
+.stat-box h2 { font-size: 2.2rem; margin-bottom: 5px; font-family: 'Nunito', sans-serif;}
+.stat-box p { margin: 0; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9;}
+
+/* 5. PC / TABLET ADJUSTMENTS */
+@media (min-width: 768px) {
+    .hero { padding: 100px 40px; }
+    .hero-text h1 { font-size: 3.5rem; }
+    .info { padding: 60px 40px; }
+    .flex-card { flex-direction: row; text-align: left; }
+    .flex-card:nth-child(even) { flex-direction: row-reverse; } /* Dusra card ulta ho jayega */
+    .stats { flex-direction: row; padding: 20px 40px 80px; } /* PC par ek line mein aayenge */
+}
 /* ══════════════════════════════
     BOTTOM NAV
 ══════════════════════════════ */
@@ -573,4 +641,59 @@ textarea.caption-input:focus { border-color: var(--orange); background: #fff; }
 @keyframes slideUp {
     from { transform: translateY(50px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
+}
+/* ══════════════════════════════
+    FOOTER SECTION (Fixed for Mobile Nav)
+══════════════════════════════ */
+.footer {
+    background: #1a1a1a;
+    color: var(--white);
+    /* DHYAN DEIN: Bottom mein 100px ki padding di hai taaki Bottom Nav ke piche na chhupe */
+    padding: 50px 20px 100px 20px; 
+}
+
+.footer-container {
+    display: flex;
+    flex-direction: column; /* Mobile par teeno columns upar-niche aayenge */
+    gap: 40px;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center; /* Mobile par center alignment premium lagti hai */
+}
+
+.footer-col h3, 
+.footer-col h4 {
+    color: var(--orange);
+    margin-bottom: 12px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+}
+
+.footer-col p {
+    margin: 8px 0;
+    color: #cccccc;
+    font-size: 0.9rem;
+    font-family: 'Nunito', sans-serif;
+}
+
+.footer-bottom {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #333333; /* Ek halki si line copyright ke upar */
+    font-size: 0.8rem;
+    color: #888888;
+}
+
+/* PC/Tablet Layout */
+@media (min-width: 768px) {
+    .footer-container {
+        flex-direction: row; /* PC par wapas 3 columns aamne-samne */
+        text-align: left;
+        justify-content: space-between;
+    }
+    .footer {
+        padding-bottom: 50px; /* PC par Bottom Nav nahi hota, isliye padding kam kardi */
+    }
 }
