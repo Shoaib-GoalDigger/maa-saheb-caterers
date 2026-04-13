@@ -133,11 +133,6 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
-# --- MEDIA FILES (IMAGES/VIDEOS) FOR CLOUDINARY ---
-# Yeh check karega ki agar CLOUDINARY_URL server par hai, tabhi Cloudinary use kare
-if 'CLOUDINARY_URL' in os.environ:
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
 
 # extra add on 
 MEDIA_URL = '/media/'
@@ -146,3 +141,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Razorpay Test Keys
 RAZORPAY_KEY_ID = 'rzp_test_SYCLG4Bb32H8Gm'
 RAZORPAY_KEY_SECRET = 'z7mnRkdMd2WZJFt47TY58ri1'
+
+# Yeh line ensure karegi ki media hamesha Cloudinary par hi save ho, Render par nahi.
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'

@@ -255,6 +255,13 @@ function removePreview(){
 }
 
 function submitPost() {
+    // 1. Button ko pakdo
+    let postBtn = document.querySelector('.btn-post');
+    
+    // 2. Button ka text change karo aur usko disable kar do
+    postBtn.innerHTML = "Posting... Please wait ⏳";
+    postBtn.disabled = true;
+    postBtn.style.opacity = "0.7";
     const cap = document.getElementById('captionInput').value.trim();
     const fileInput = document.getElementById('fileInput'); 
     const file = fileInput.files[0];
