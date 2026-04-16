@@ -147,15 +147,14 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': 'Yl9NcXJIpafg6Z6iMBiFRp4qCv6U' # Apna API Secret yahan paste karo
 }
 
-# Yeh line sirf Cloudinary package ko crash hone se bachane ke liye hai
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
-
-# --- NAYA DJANGO STORAGE SYSTEM ---
+# --- NAYA DJANGO STORAGE SYSTEM (BUG FIXED) ---
 STORAGES = {
     "default": {
+        # Photos/Videos Cloudinary mein jayengi
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        # Normal storage use karenge taaki uk.js wala error na aaye
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
