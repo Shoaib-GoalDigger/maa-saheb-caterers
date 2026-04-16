@@ -147,14 +147,15 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': 'Yl9NcXJIpafg6Z6iMBiFRp4qCv6U' # Apna API Secret yahan paste karo
 }
 
+# Yeh line sirf Cloudinary package ko crash hone se bachane ke liye hai
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+
 # --- NAYA DJANGO STORAGE SYSTEM ---
 STORAGES = {
     "default": {
-        # Yeh aapki Photos/Videos ko hamesha Cloudinary mein bhejega
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        # Yeh CSS/JS design files ke liye hai
         "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
