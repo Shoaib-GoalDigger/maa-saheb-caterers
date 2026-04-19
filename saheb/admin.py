@@ -1,10 +1,10 @@
 from django.contrib import admin
-from .models import Post, Comment , Order ,ContactMessage ,Payment
+from .models import Post, Comment , Order ,ContactMessage 
 
 # In dono ko register karne se ye Admin Panel mein dikhne lagenge
 admin.site.register(Post)
 admin.site.register(Comment)
-admin.site.register(Payment)
+
 
 
 @admin.register(Order)

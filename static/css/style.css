@@ -697,3 +697,21 @@ textarea.caption-input:focus { border-color: var(--orange); background: #fff; }
         padding-bottom: 50px; /* PC par Bottom Nav nahi hota, isliye padding kam kardi */
     }
 }
+
+/* --- X CANCEL BUTTON STYLE --- */
+.close-x {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #555;
+    cursor: pointer;
+    z-index: 20;
+    transition: 0.2s;
+}
+.close-x:hover {
+    color: #C1121F; /* Hover karne par Maa-Saheb ka Red color */
+}

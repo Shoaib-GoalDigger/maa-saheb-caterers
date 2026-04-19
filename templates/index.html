@@ -75,8 +75,11 @@
  
 
 {% comment %} image posting {% endcomment %}
+
 <div class="overlay" id="postOverlay" onclick="bgClose(event,'postOverlay',resetPost)">
   <div class="sheet" id="postSheet">
+    <button class="close-x" onclick="closePostSheet()">✖</button>
+    
     <div class="sheet-handle"></div>
     <h3>Share a Moment 📸</h3>
     <input type="file" id="fileInput" accept="image/*,video/*" onchange="previewFile(this)"/>
@@ -98,10 +101,10 @@
   </div>
 </div>
 
-
 {% comment %} comment overlay {% endcomment %}
 <div class="overlay" id="commentOverlay" onclick="bgClose(event,'commentOverlay',null)">
   <div class="sheet" id="commentSheet">
+    <button class="close-x" onclick="close_('commentOverlay')">✖</button>
     <div class="sheet-handle"></div>
     <h4 style="text-align:center; margin-bottom:15px;">Comments 💬</h4>
     
@@ -117,8 +120,10 @@
   </div>
 </div>
  
+{% comment %} share sssss {% endcomment %}
 <div class="overlay" id="shareOverlay" onclick="bgClose(event,'shareOverlay',null)">
   <div class="sheet" id="shareSheet">
+    <button class="close-x" onclick="close_('shareOverlay')">✖</button>
     <div class="sheet-handle"></div>
     <h4>Share this post</h4>
     <div class="share-grid">
@@ -292,6 +297,7 @@
 {% csrf_token %}
 <div class="overlay" id="contactOverlay" onclick="bgClose(event,'contactOverlay',null)">
   <div class="sheet" id="contactSheet">
+    <button class="close-x" onclick="close_('contactOverlay')">✖</button>
     <div class="sheet-handle"></div>
     <h3>Contact Us 🤝</h3>
     <p class="contact-sub">We'd love to hear from you. Fill in your details and we'll get back to you soon.</p>
@@ -307,14 +313,15 @@
       <label>MESSAGE</label>
       <textarea id="contactMessage" rows="4" placeholder="Tell us about your event or enquiry..."></textarea>
     </div>
-    <button class="btn-send" onclick="submitContact()">Send Message 📨</button>
+    <button id="contactSubmitBtn" class="btn-send" onclick="submitContact()">Send Message 📨</button>
   </div>
 </div>
 
 
 {% comment %} payment get way form {% endcomment %}
 <div id="orderOverlay" class="overlay" onclick="bgClose(event, 'orderOverlay')">
-    <div class="order-sheet">
+    <div class="order-sheet" style="position: relative;">
+      <button class="close-x" onclick="close_('orderOverlay')">✖</button>
         
         <div id="formSection">
             <div class="sheet-header">
@@ -334,20 +341,28 @@
                 <button class="pay-btn" onclick="handlePaymentClick()">Pay Now</button>
             </div>
         </div>
-
+        
         <div id="qrSection" style="display:none; text-align:center;">
             <h3 class="modal-title">Scan & Pay ₹<span id="qrAmountDisplay"></span></h3>
+            
+            <p style="font-size: 1.2rem; font-weight: 700; color: #1A0A00; margin-top: -5px; margin-bottom: 10px;">Zain Merchant</p>
             
             <div class="qr-box">
                 <img src="{%static 'images/qr.jpg'%}" alt="Maa-Saheb QR" class="qr-img">
             </div>
             
+            <div style="margin: 15px auto; padding: 10px; max-width: 250px; background: #f9f9f9; border-radius: 8px; border: 1px dashed #C1121F; display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.85rem; color: #555;">UPI / No:</span>
+                <strong id="upiNumber" style="font-size: 1.1rem; letter-spacing: 1px;">9833759589</strong>
+                <button onclick="copyUPI()" id="copyBtn" style="background: #C1121F; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: 0.3s;">Copy</button>
+            </div>
+            
             <p class="qr-instruction">
-              1. Scan this QR code using any UPI App (GPay, PhonePe, Paytm).<br>
+              1. Scan this QR code or Copy the number to pay via any UPI App (GPay, PhonePe, Paytm).<br>
               2. After payment, click the button below to send the <b>Screenshot</b> for verification.
             </p>
     
-    <button class="wa-confirm-btn" onclick="redirectToWhatsApp()">
+            <button class="wa-confirm-btn" onclick="redirectToWhatsApp()">
                 I have Paid. Confirm on WhatsApp ✅
             </button>
             
@@ -357,29 +372,35 @@
     </div>
 </div>
 
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
 <script>
   let posts = [
     {% for post in db_posts %}
     {
       id: {{ post.id }},
       {% if post.media %}
-      url: "{{ post.media.url|escapejs }}",
-      isVideo: "{{ post.media.name|lower }}".endsWith(".mp4") || "{{ post.media.name|lower }}".endsWith(".mov") || "{{ post.media.name|lower }}".endsWith(".avi"),
+          // NAYA MASTER FIX: Pehle URL uthao
+          url: (function() {
+              let rawUrl = "{{ post.media.url|escapejs }}";
+              let fileName = "{{ post.media.name|lower }}";
+              // Check karo agar video format hai
+              if (fileName.includes(".mp4") || fileName.includes(".mov") || fileName.includes(".webm") || fileName.includes(".avi")) {
+                  // Agar video hai toh '/image/upload/' ko badal kar '/video/upload/' kardo
+                  return rawUrl.replace('/image/upload/', '/video/upload/');
+              }
+              return rawUrl;
+          })(),
+          // Video check logic
+          isVideo: "{{ post.media.name|lower }}".match(/\.(mp4|mov|avi|webm|mkv|flv)/) !== null,
       {% else %}
-      url: "",
-      isVideo: false,
+          url: "",
+          isVideo: false,
       {% endif %}
+      
       caption: "{{ post.caption|escapejs }}",
       tags: "", 
       likes: {{ post.likes_count|default:0 }},
       liked: false,
-      
-      // FIX: Naam wapas 'comments' kar diya hai taaki undefined na aaye
       comments: {{ post.comments.count|default:0 }},
-      
-      // FIX: Asli comments ki list
       comments_list: [
         {% for c in post.comments.all %}
         {
@@ -388,7 +409,6 @@
         }{% if not forloop.last %},{% endif %}
         {% endfor %}
       ],
-      
       time: "{{ post.created_at|timesince }} ago"
     }{% if not forloop.last %},{% endif %}
     {% endfor %}

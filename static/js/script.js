@@ -64,8 +64,9 @@ function buildFeed() {
     if (!container) return;
 
     container.innerHTML = posts.map((p, idx) => {
+       // NAYA UI FIX: controls hata diya, muted hata diya, background white kar diya
         const mediaHTML = p.isVideo 
-            ? `<video src="${p.url}" loop class="feed-video" id="video_${p.id}" style="width: 100%; max-height: 550px; object-fit: contain; display: block; margin: 0 auto;"></video>`
+            ? `<video src="${p.url}" loop playsinline class="feed-video" id="video_${p.id}" style="width: 100%; max-height: 550px; object-fit: contain; display: block; margin: 0 auto; background: #ffffff; cursor: pointer;"></video>`
             : `<img src="${p.url}" alt="food" loading="lazy" style="width: 100%; max-height: 550px; object-fit: contain; display: block; margin: 0 auto;"/>`;
 
         return `
@@ -79,7 +80,7 @@ function buildFeed() {
                 <button class="post-more" onclick="deletePost(${p.id})">🗑️</button>
             </div>
 
-            <div class="post-media" ondblclick="dtLike(${p.id})" style="width: 100%; height: auto; background: transparent; display: flex; justify-content: center; align-items: center;">
+            <div class="post-media" ondblclick="toggleLike(${p.id})" style="width: 100%; height: auto; background: transparent; display: flex; justify-content: center; align-items: center;">
                 ${mediaHTML}
                 <div class="heart-burst" id="hb${p.id}">❤️</div>
             </div>
@@ -115,6 +116,8 @@ function buildFeed() {
     }).join('');
 }
 
+
+// deleteeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 async function deletePost(postId) {
     if (!confirm("Are you sure you want to delete this post?")) return;
     try {
@@ -325,6 +328,7 @@ function backToForm() {
 }
 
 // script.js mein purane handlePaymentClick ko isse replace karein
+// NAYA FAST PAYMENT FLOW (No Razorpay, Direct QR)
 async function handlePaymentClick() {
     const name = document.getElementById('custName').value.trim();
     const phone = document.getElementById('custPhone').value.trim();
@@ -338,82 +342,47 @@ async function handlePaymentClick() {
     }
 
     try {
+        // 1. Button ko thoda update karo taaki user ko lage process ho raha hai
+        const payBtn = document.querySelector('.pay-btn');
+        payBtn.innerText = "Processing...";
+        payBtn.disabled = true;
+
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         
-        // 1. Order save karne ke liye
-        await fetch('/save-order/', {
+        // 2. Order direct Database mein save karo
+        const response = await fetch('/save-order/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
             body: JSON.stringify({ name: name, phone: phone }) 
         });
 
-        // 2. Razorpay Order Create karne ke liye backend ko call
-        const rzpRes = await fetch('/create-razorpay-order/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
-            body: JSON.stringify({ name: name, amount: amount })
-        });
-        const rzpData = await rzpRes.json();
+        const result = await response.json();
 
-        if (rzpData.status === "success") {
-            // 3. Razorpay ka Popup open karo
-            var options = {
-                "key": rzpData.key,
-                "amount": rzpData.amount,
-                "currency": "INR",
-                "name": "Maa-Saheb Caterers",
-                "description": document.getElementById('orderItemName').textContent,
-                "order_id": rzpData.order_id,
-                "handler": async function (response) {
-                    
-                    // 4. SUCCESS: Jab customer pay kar de, to backend se verify karo
-                    const verifyRes = await fetch('/verify-payment/', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
-                        body: JSON.stringify(response)
-                    });
-                    const verifyData = await verifyRes.json();
-                    
-                    if (verifyData.status === "success") {
-                        // 5. SUCCESS HONE PAR UI CHANGE KARO
-                        document.getElementById('formSection').style.display = 'none';
-                        document.getElementById('qrSection').style.display = 'block';
-                        
-                        document.querySelector('.modal-title').innerText = "Payment Successful! 🎉";
-                        document.querySelector('.qr-instruction').innerHTML = "Thank you for the payment.<br>Please click below to confirm your order on WhatsApp.";
-                        
-                        const qrBox = document.querySelector('.qr-box');
-                        if(qrBox) qrBox.style.display = 'none'; // QR Image hide kardo
-                        
-                        document.getElementById('qrAmountDisplay').textContent = amount;
-                    } else {
-                        alert("Payment verification failed! Please contact support.");
-                    }
-                },
-                "theme": { "color": "#C1121F" } // Maa-saheb theme color (Red)
-            };
+        if (result.status === 'success') {
+            // 3. SUCCESS HONE PAR DIRECT QR SECTION DIKHAO
+            document.getElementById('formSection').style.display = 'none';
+            document.getElementById('qrSection').style.display = 'block';
             
-            var rzp1 = new Razorpay(options);
-
-            // NAYA CODE: Agar payment fail ho jaye ya user cancel kar de
-            rzp1.on('payment.failed', function (response){
-                alert("Payment Failed! ❌ Reason: " + response.error.description);
-            });
-
-            rzp1.open();
-            
+            // Amount QR screen par set karo
+            document.getElementById('qrAmountDisplay').textContent = amount;
         } else {
-            alert("Error initiating payment");
+            alert("Error: " + result.message);
         }
+
+        // Button wapas normal kardo (agar user back aata hai)
+        payBtn.innerText = "Pay Now";
+        payBtn.disabled = false;
 
     } catch (error) {
         console.error("Error:", error);
         alert("Something went wrong!");
+        
+        const payBtn = document.querySelector('.pay-btn');
+        payBtn.innerText = "Pay Now";
+        payBtn.disabled = false;
     }
-
-    // NOTE: Yahan niche jo 'isMobile' aur 'upiUrl' wala lamba code tha, 
-    // wo maine delete kar diya hai kyunki ab Razorpay sab khud handle karega!
 }
+// whatssssssssssaaaaaaappppppppppppp
 function redirectToWhatsApp() {
     const name = document.getElementById('custName').value;
     const phone = document.getElementById('custPhone').value;
@@ -464,10 +433,17 @@ function openContactSheet(){ document.getElementById('contactOverlay').classList
 // Note: Aap isko apni nayi handleContactSubmit (Django fetch wali) se replace kar sakte ho
 /* ── CONTACT US BACKEND CONNECTION ── */
 async function submitContact() {
-    // 1. Inputs se data uthao (Same IDs as your HTML)
-    const name = document.getElementById('contactName').value.trim();
-    const phone = document.getElementById('contactPhone').value.trim();
-    const message = document.getElementById('contactMessage').value.trim();
+    // 1. Sahi ID se button ko pakdo
+    const submitBtn = document.getElementById('contactSubmitBtn');
+    
+    // Inputs se data uthao
+    const nameInput = document.getElementById('contactName');
+    const phoneInput = document.getElementById('contactPhone');
+    const messageInput = document.getElementById('contactMessage');
+
+    const name = nameInput.value.trim();
+    const phone = phoneInput.value.trim();
+    const message = messageInput.value.trim();
 
     // 2. Validation check
     if (!name || !phone || !message) {
@@ -475,11 +451,16 @@ async function submitContact() {
         return;
     }
 
+    // --- LOADING START ---
+    if (submitBtn) {
+        submitBtn.innerHTML = "Sending Message... ⏳"; // innerHTML use kiya hai
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = "0.7";
+    }
+
     try {
-        // 3. CSRF Token uthao (Jo aapne HTML mein sabse upar dala hai)
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-        // 4. Fetch call to Django View
         const response = await fetch('/submit-contact/', {
             method: 'POST',
             headers: {
@@ -494,12 +475,10 @@ async function submitContact() {
         if (result.status === 'success') {
             alert("Thank you! Your message has been sent to Maa-Saheb Caterers. ✅");
             
-            // 5. Form clear kardo
-            document.getElementById('contactName').value = '';
-            document.getElementById('contactPhone').value = '';
-            document.getElementById('contactMessage').value = '';
+            nameInput.value = '';
+            phoneInput.value = '';
+            messageInput.value = '';
             
-            // 6. Modal band kardo (Hamara purana helper function)
             close_('contactOverlay');
         } else {
             alert("Error: " + result.message);
@@ -507,6 +486,13 @@ async function submitContact() {
     } catch (error) {
         console.error("Error sending message:", error);
         alert("Something went wrong. Please check your connection.");
+    } finally {
+        // --- LOADING STOP (Button wapas normal) ---
+        if (submitBtn) {
+            submitBtn.innerHTML = "Send Message 📨"; // Purana look wapas
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = "1";
+        }
     }
 }
 /* ==========================================================================
@@ -544,3 +530,25 @@ document.addEventListener('click', function(e) {
         }
     }
 });
+
+// copy number logc
+// UPI Number Copy Karne Ka Function
+function copyUPI() {
+    // Number uthao
+    const upiNumber = document.getElementById("upiNumber").innerText;
+    
+    // Mobile/Laptop ke clipboard (memory) mein save karo
+    navigator.clipboard.writeText(upiNumber).then(() => {
+        const copyBtn = document.getElementById("copyBtn");
+        
+        // Button ka style change karo taaki user ko pata chale copy ho gaya
+        copyBtn.innerText = "Copied! ✅";
+        copyBtn.style.background = "#25D366"; // WhatsApp jaisa Green color
+        
+        // 2 second baad wapas normal kar do
+        setTimeout(() => {
+            copyBtn.innerText = "Copy";
+            copyBtn.style.background = "#C1121F"; // Wapas Red
+        }, 2000);
+    });
+}

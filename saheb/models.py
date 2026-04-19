@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-# from django.db import db
+
 
 class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
@@ -41,16 +41,3 @@ class ContactMessage(models.Model):
         return f"Message from {self.name} - {self.created_at.strftime('%d %b')}"
 
 from django.db import models
-
-
-# Razorpay integration
-class Payment(models.Model):
-    name = models.CharField(max_length=100)
-    amount = models.CharField(max_length=100)
-    provider_order_id = models.CharField(max_length=40, verbose_name="Order ID")
-    payment_id = models.CharField(max_length=36, verbose_name="Payment ID")
-    signature_id = models.CharField(max_length=128, verbose_name="Signature ID")
-    status = models.BooleanField(default=False, verbose_name="Payment Status")
-
-    def __str__(self):
-        return f"{self.name} - {self.amount} - {'Success' if self.status else 'Failed'}"
